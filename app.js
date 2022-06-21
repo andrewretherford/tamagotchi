@@ -6,11 +6,13 @@ const MAX_HUNGER = 15
 const MAX_FATIGUE = 20
 const MAX_BOREDOM = 25
 const MAX_AGE = 80
-const INTERVAL = 2000
+const STATS_INTERVAL = 3000
+const AGE_INTERVAL = 5000
 
 // State variables
-let hungerValue, fatigueValue, boredomValue, ageValue
+let hungerValue, fatigueValue, boredomValue, ageValue, userMessage
 let numAttributes, attributes
+let tamagotchi
 
 class Tamagotchi {
     constructor() {
@@ -25,18 +27,21 @@ class Tamagotchi {
         if(this.hunger > 0) {
             this.hunger--
         }
+        render()
     }
     
     play() {
         if(this.boredom > 0) {
             this.boredom--
         }
+        render()
     }
     
     sleep() {
         if(this.fatigue > 0) {
             this.fatigue--
         }
+        render()
     }
     
     isLiving() {
@@ -47,8 +52,11 @@ class Tamagotchi {
         }
     }
 
-    age() {
+    growOlder() {
         this.age++
+        if(this.age > MAX_AGE) {
+
+        }
     }
 }
 
@@ -65,28 +73,48 @@ const sleep = document.querySelector('.sleep')
 const playNow = document.querySelector('.play-now')
 
 //----- Containers -----
+const title = document.querySelector('.title')
 const statsContainer = document.querySelector('.stats-container')
 const actionButtonContainer = document.querySelector('.action-button-container')
 const playButtonContainer = document.querySelector('.play-button-container')
+const messageBox = document.querySelector('.message-box')
+
+//----- Elements -----
+const message = document.querySelector('.message')
 
 // Event handlers and listeners
-function interactionHandler (e) {
+function interactionHandler(e) {
     let target = e.target
 
-    if(target.name != 'button') {
-        return
-    }
-
+    // if(target.tagName != 'button') {
+    //     return
+    // }
+    console.log(e.target)
     if(e.target.classList.contains('feed')) {
-        tamag.feed()
+        tamagotchi.feed()
+        console.log('clicked feed')
     } else if(e.target.classList.contains('play')) {
-        tamag.play()
+        tamagotchi.play()
+        console.log('clicked play')
     } else if (e.target.classList.contains('sleep')) {
-        tamag.sleep()
+        tamagotchi.sleep()
+        console.log('clicked sleep')
     } else {
         return
     }
 }
+
+function gameStartHandler() {
+    showHide(title)
+    showHide(playButtonContainer)
+    showHide(actionButtonContainer)
+    showHide(statsContainer)
+    tamagotchi = init()
+    render()
+}
+
+playNow.addEventListener('click', gameStartHandler)
+actionButtonContainer.addEventListener('click', interactionHandler)
 
 // General Functions
 
@@ -104,10 +132,15 @@ function entropy(currentPet) {
                 break
         }
     }
+    render()
 }
 
 function randomIndex() {
     return Math.floor(Math.random() *3)
+}
+
+function showHide(element) {
+    element.classList.toggle('hide')
 }
 
 // Init function
@@ -115,13 +148,22 @@ function randomIndex() {
 
 function init() {
     attributes = ['hunger', 'boredom', 'fatigue']
-    const tamagotchi = new Tamagotchi()
-    setInterval(entropy, INTERVAL, tamagotchi)
+    const newTamagotchi = new Tamagotchi()
+    setInterval(entropy, STATS_INTERVAL, newTamagotchi)
+    setInterval((currentPet) => currentPet.growOlder(), AGE_INTERVAL, newTamagotchi)
+    return newTamagotchi
 }
 
 // Render function
 
 function render() {
+// update stats
+    hunger.innerHTML = `Hunger: ${tamagotchi.hunger}`
+    boredom.innerHTML = `Boredom: ${tamagotchi.boredom}`
+    fatigue.innerHTML = `Fatigue: ${tamagotchi.fatigue}`
+    age.innerHTML = `Age: ${tamagotchi.age}`
 
+    // update message
+    message.value = userMessage
 }
 
