@@ -12,6 +12,7 @@ const AGE_INTERVAL = 5000
 // State variables
 let hungerValue, fatigueValue, boredomValue, ageValue, userMessage
 let numAttributes, attributes
+let statsInterval, ageInterval
 let tamagotchi
 
 class Tamagotchi {
@@ -46,6 +47,9 @@ class Tamagotchi {
     
     isLiving() {
         if(this.hunger > MAX_HUNGER || this.fatigue > MAX_FATIGUE || this.boredom > MAX_BOREDOM || this.age > MAX_AGE) {
+            userMessage = 'GAME OVER'
+            clearInterval(statsInterval)
+            clearInterval(ageInterval)
             return false
         } else {
             return true
@@ -54,9 +58,6 @@ class Tamagotchi {
 
     growOlder() {
         this.age++
-        if(this.age > MAX_AGE) {
-
-        }
     }
 }
 
@@ -89,7 +90,8 @@ function interactionHandler(e) {
     // if(target.tagName != 'button') {
     //     return
     // }
-    console.log(e.target)
+    // console.log(e.target)
+
     if(e.target.classList.contains('feed')) {
         tamagotchi.feed()
         console.log('clicked feed')
@@ -149,21 +151,27 @@ function showHide(element) {
 function init() {
     attributes = ['hunger', 'boredom', 'fatigue']
     const newTamagotchi = new Tamagotchi()
-    setInterval(entropy, STATS_INTERVAL, newTamagotchi)
-    setInterval((currentPet) => currentPet.growOlder(), AGE_INTERVAL, newTamagotchi)
+    statsInterval = setInterval(entropy, STATS_INTERVAL, newTamagotchi)
+    ageInterval = setInterval((currentPet) => currentPet.growOlder(), AGE_INTERVAL, newTamagotchi)
+    userMessage = ''
     return newTamagotchi
 }
 
 // Render function
 
 function render() {
-// update stats
+    // check to see if it's alive
+    if(!tamagotchi.isLiving()) {
+        showHide(messageBox)
+    }
+
+    // update stats
     hunger.innerHTML = `Hunger: ${tamagotchi.hunger}`
     boredom.innerHTML = `Boredom: ${tamagotchi.boredom}`
     fatigue.innerHTML = `Fatigue: ${tamagotchi.fatigue}`
     age.innerHTML = `Age: ${tamagotchi.age}`
 
     // update message
-    message.value = userMessage
+    message.innerHTML = userMessage
 }
 
