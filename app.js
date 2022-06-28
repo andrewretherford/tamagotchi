@@ -6,7 +6,7 @@ const MAX_HUNGER = 15
 const MAX_FATIGUE = 20
 const MAX_BOREDOM = 25
 const MAX_AGE = 80
-const STATS_INTERVAL = 3000
+const STATS_INTERVAL = 1000
 const AGE_INTERVAL = 5000
 
 // State variables
